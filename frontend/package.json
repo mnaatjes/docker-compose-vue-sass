@@ -1,0 +1,19 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "watch:css": "sass --watch public/style.scss:public/style.css"
+  },
+  "dependencies": {
+    "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^5.0.8",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.2.2"
+  }
+}

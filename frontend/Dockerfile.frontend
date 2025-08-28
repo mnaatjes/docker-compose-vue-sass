@@ -1,0 +1,36 @@
+# Stage 1: Build the application
+FROM node:18-bullseye-slim AS build
+
+# Set the working directory
+WORKDIR /app
+
+# Install Vue CLI and Sass
+RUN npm install -g @vue/cli sass
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the application source code
+COPY . .
+
+# Build the Vue.js app
+RUN npm run build --no-color
+
+# Stage 2: Serve the application using a lightweight Apache image
+FROM httpd:2.4-alpine AS serve
+
+# Copy the vhost configuration file
+COPY vhost.conf /usr/local/apache2/conf/vhosts/000-default.conf
+
+# Overwrite the default Apache configuration
+RUN sed -i 's/Include conf\/extra\/httpd-vhosts.conf/#Include conf\/extra\/httpd-vhosts.conf/' /usr/local/apache2/conf/httpd.conf
+RUN echo 'Include conf/vhosts/000-default.conf' >> /usr/local/apache2/conf/httpd.conf
+
+# Copy the built files from the build stage to the Apache web root
+COPY --from=build /app/dist /usr/local/apache2/htdocs
+
+# Expose port 80
+EXPOSE 80
+
+# Apache is configured to run in the foreground by the command in docker-compose.yml

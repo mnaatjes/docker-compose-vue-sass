@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/vhost.conf:/usr/local/apache2/conf/vhosts/000-default.conf
+    restart: unless-stopped
+    command: ["/bin/sh", "-c", "echo 'LoadModule proxy_module modules/mod_proxy.so' >> /usr/local/apache2/conf/httpd.conf && echo 'LoadModule proxy_http_module modules/mod_proxy_http.so' >> /usr/local/apache2/conf/httpd.conf && httpd-foreground"]
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    command: ["npm", "start"]
